@@ -41,7 +41,6 @@ def build_data(project, auth_token)
   api_url = api_url % [project[:user], project[:repo], auth_token]
   api_response =  HTTParty.get(api_url, :headers => { "Accept" => "application/json" } )
   api_json = JSON.parse(api_response.body)
-  puts "foo*****************"
   return {} if api_json.empty?
 
   latest_build = api_json.select{ |build| build['status'] != 'queued' }.first
