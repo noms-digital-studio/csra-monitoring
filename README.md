@@ -24,7 +24,7 @@ http://localhost:3030/circle
 
 Heroku
 ----
-https://csra-monitor.herokuapp.com/circle
+https://csra-monitoring.herokuapp.com/circle
 
 
 Further Reading on Smashing
