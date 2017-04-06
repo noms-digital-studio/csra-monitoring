@@ -3,6 +3,7 @@ require 'httparty'
 
 projects = [
   { user: 'noms-digital-studio', repo: 'csra-mvp'},
+  { user: 'noms-digital-studio', repo: 'csra-app'},
 ]
 
 def duration(time)
