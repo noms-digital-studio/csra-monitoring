@@ -29,10 +29,7 @@ ping_count = 10
 #      the check will return false
 #
 servers = [
-    {name: 'hub admin ui', url: 'https://hub-admin-ui.herokuapp.com/health', method: 'http', auth: true},
-    {name: 'hub admin', url: 'https://hub-admin.herokuapp.com/hub-admin/health', method: 'http'},
-    {name: 'hub content feed', url: 'https://hub-content-feed.herokuapp.com/health', method: 'http'},
-    {name: 'hub content feed ui', url: 'https://hub-content-feed-ui.herokuapp.com', method: 'http'},
+    {name: 'csra-mvp', url: 'http://csra-mock.hmpps.dsd.io/health', method: 'http'},
 ]
  
 SCHEDULER.every '15s', :first_in => 0 do |job|

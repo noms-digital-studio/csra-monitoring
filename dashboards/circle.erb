@@ -1,18 +1,29 @@
 <% content_for(:title) { "Build Status" } %>
 <div class="gridster">
   <ul>
-
     <li data-row="1" data-col="1" data-sizex="1" data-sizey="1">
       <div data-id="Build" data-view="Text" data-title="CSRA CI Status"></div>
     </li>
 
-    <li data-row="1" data-col="1" data-sizex="1" data-sizey="1">
+    <li data-row="1" data-col="2" data-sizex="1" data-sizey="1">
       <div data-id="circle-ci-noms-digital-studio-csra-mvp-master" data-view="CircleCi" data-title="CSRA MVP"></div>
     </li>
 
-    <li data-row="1" data-col="1" data-sizex="1" data-sizey="1">
+    <li data-row="1" data-col="3" data-sizex="1" data-sizey="1">
       <div data-id="circle-ci-noms-digital-studio-csra-app-master" data-view="CircleCi" data-title="CSRA APP"></div>
     </li>
 
+    <li data-row="2" data-col="1" data-sizex="1" data-sizey="1">
+      <div data-id="Health" data-view="Text" data-title="CSRA App Status"></div>
+    </li>
+
+    <li data-row="2" data-col="2" data-sizex="1" data-sizey="1">
+      <div data-id="csra-app-mock" data-view="ServerStatusSquares" data-title="CSRA MOCK"></div>
+    </li>
+
+    <li data-row="2" data-col="3" data-sizex="1" data-sizey="1">
+      <div data-id="csra-app-stage" data-view="ServerStatusSquares" data-title="CSRA STAGE"></div>
+    </li>
   </ul>
+
 </div>
