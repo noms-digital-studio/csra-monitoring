@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 require 'net/http'
 require 'uri'
- 
+
 #
 ### Global Config
 #
@@ -28,57 +28,62 @@ ping_count = 10
 #   => If the server you're checking redirects (from http to https for example) 
 #      the check will return false
 #
+
 servers = [
-    {name: 'csra-mvp', url: 'http://csra-mock.hmpps.dsd.io/health', method: 'http'},
+    {name: 'csra-app-mock', url: 'http://csra-mock.hmpps.dsd.io/health', method: 'http'},
+    {name: 'csra-app-stage', url: 'http://csra-stage.hmpps.dsd.io/health', method: 'http'},
 ]
- 
-SCHEDULER.every '15s', :first_in => 0 do |job|
-    basic_auth = ENV['BASIC_AUTH']
 
-    servers.each do |server|
-        if server[:method] == 'http'
-            begin
-                uri = URI.parse(server[:url])
+def gather_health_data(server)
+    result = 0
+    if server[:method] == 'http'
+        begin
+            uri = URI.parse(server[:url])
 
-                http = Net::HTTP.new(uri.host, uri.port)
-                http.read_timeout = httptimeout
-                if uri.scheme == "https"
-                    http.use_ssl=true
-                    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-                end
-
-                request = Net::HTTP::Get.new(uri.request_uri)
-                if server[:auth] == true
-                    request.basic_auth basic_auth.split(':').first, basic_auth.split(':').last
-                end
-
-                response = http.request(request)
-
-                if response.code == "200"
-                    result = 1
-                else
-                    result = 0
-                end
-            rescue Timeout::Error
-                result = 0
-            rescue Errno::ETIMEDOUT
-                result = 0
-            rescue Errno::EHOSTUNREACH
-                result = 0
-            rescue Errno::ECONNREFUSED
-                result = 0
-            rescue SocketError => e
-                result = 0
+            http = Net::HTTP.new(uri.host, uri.port)
+            http.read_timeout = HTTP_TIMEOUT
+            if uri.scheme == "https"
+                http.use_ssl=true
+                http.verify_mode = OpenSSL::SSL::VERIFY_NONE
             end
-        elsif server[:method] == 'ping'
-            result = `ping -q -c #{ping_count} #{server[:url]}`
-            if ($?.exitstatus == 0)
+
+            request = Net::HTTP::Get.new(uri.request_uri)
+            if server[:auth]
+                request.basic_auth basic_auth.split(':').first, basic_auth.split(':').last
+            end
+
+            response = http.request(request)
+
+            if response.code == "200"
                 result = 1
             else
                 result = 0
             end
+        rescue Timeout::Error
+            result = 0
+        rescue Errno::ETIMEDOUT
+            result = 0
+        rescue Errno::EHOSTUNREACH
+            result = 0
+        rescue Errno::ECONNREFUSED
+            result = 0
+        rescue SocketError => e
+            result = 0
         end
-
-        send_event(server[:name], result: result)
+    elsif server[:method] == 'ping'
+        result = `ping -q -c #{PING_COUNT} #{server[:url]}`
+        if $?.exitstatus == 0
+            result = 1
+        else
+            result = 0
+        end
     end
+    result
+end
+
+SCHEDULER.every '60s', :first_in => 0 do |job|
+  servers.each do |server|
+    result = gather_health_data(server)
+    send_event(server[:name], result: result)
+  end
 end
