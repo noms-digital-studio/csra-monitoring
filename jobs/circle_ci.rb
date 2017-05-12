@@ -4,7 +4,6 @@ HTTP_TIMEOUT = 60
 PING_COUNT = 10
 
 ci_projects = [
-  { user: 'noms-digital-studio', repo: 'csra-mvp', branch: 'master'},
   { user: 'noms-digital-studio', repo: 'csra-app', branch: 'master'},
 ]
 
