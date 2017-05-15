@@ -32,6 +32,7 @@ ping_count = 10
 servers = [
     {name: 'csra-app-mock', url: 'http://csra-mock.hmpps.dsd.io/health', method: 'http'},
     {name: 'csra-app-stage', url: 'http://csra-stage.hmpps.dsd.io/health', method: 'http'},
+    {name: 'csra-app-prod', url: 'https://csra.service.hmpps.dsd.io/health', method: 'http', auth: true},
 ]
 
 def gather_health_data(server)
@@ -49,6 +50,7 @@ def gather_health_data(server)
 
             request = Net::HTTP::Get.new(uri.request_uri)
             if server[:auth]
+                basic_auth = ENV['BASIC_AUTH']
                 request.basic_auth basic_auth.split(':').first, basic_auth.split(':').last
             end
 
