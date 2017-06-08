@@ -8,11 +8,11 @@ require 'uri'
 # httptimeout => Number in seconds for HTTP Timeout. Set to ruby default of 60 seconds.
 # ping_count => Number of pings to perform for the ping method
 #
-httptimeout = 60
-ping_count = 10
+HTTP_TIMEOUT = 60
+PING_COUNT = 10
 
-# 
-# Check whether a server is Responding you can set a server to 
+#
+# Check whether a server is Responding you can set a server to
 # check via http request or ping
 #
 # Server Options
@@ -25,18 +25,19 @@ ping_count = 10
 #       => ping
 #
 # Notes:
-#   => If the server you're checking redirects (from http to https for example) 
+#   => If the server you're checking redirects (from http to https for example)
 #      the check will return false
 #
 
 servers = [
     {name: 'csra-app-mock', url: 'http://csra-mock.hmpps.dsd.io/health', method: 'http'},
-    {name: 'csra-app-stage', url: 'http://csra-stage.hmpps.dsd.io/health', method: 'http'},
-    {name: 'csra-app-prod', url: 'https://csra.service.hmpps.dsd.io/health', method: 'http', auth: true},
+    {name: 'csra-app-stage', url: 'https://csra-stage.hmpps.dsd.io/health', method: 'http'},
+    # {name: 'csra-app-prod', url: 'https://csra.service.hmpps.dsd.io/health', method: 'http', auth: true},
 ]
 
 def gather_health_data(server)
     result = 0
+    puts "requesting #{server[:url]}..."
     if server[:method] == 'http'
         begin
             uri = URI.parse(server[:url])
@@ -44,8 +45,7 @@ def gather_health_data(server)
             http = Net::HTTP.new(uri.host, uri.port)
             http.read_timeout = HTTP_TIMEOUT
             if uri.scheme == "https"
-                http.use_ssl=true
-                http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+                http.use_ssl = true
             end
 
             request = Net::HTTP::Get.new(uri.request_uri)
@@ -80,6 +80,7 @@ def gather_health_data(server)
             result = 0
         end
     end
+    puts "Result from #{server[:url]} is #{result}"
     result
 end
 
