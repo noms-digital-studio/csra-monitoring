@@ -32,7 +32,7 @@ PING_COUNT = 10
 servers = [
     {name: 'csra-app-mock', url: 'http://csra-mock.hmpps.dsd.io/health', method: 'http'},
     {name: 'csra-app-stage', url: 'https://csra-stage.hmpps.dsd.io/health', method: 'http'},
-    # {name: 'csra-app-prod', url: 'https://csra.service.hmpps.dsd.io/health', method: 'http', auth: true},
+    {name: 'csra-app-prod', url: 'http://health-kick.hmpps.dsd.io/https/csra.service.hmpps.dsd.io', method: 'http'},
 ]
 
 def gather_health_data(server)
