@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 require 'net/http'
 require 'uri'
+require 'httparty'
 
 #
 ### Global Config
@@ -30,61 +31,23 @@ PING_COUNT = 10
 #
 
 servers = [
-    {name: 'csra-app-mock', url: 'https://csra-mock.hmpps.dsd.io/health', method: 'http'},
-    {name: 'csra-app-stage', url: 'https://csra-stage.hmpps.dsd.io/health', method: 'http'},
-    {name: 'csra-app-prod', url: 'http://health-kick.hmpps.dsd.io/https/csra.service.hmpps.dsd.io', method: 'http'},
+  { name: 'csra-app-mock', url: 'https://csra-mock.hmpps.dsd.io/health', method: 'http' },
+  { name: 'csra-app-stage', url: 'https://csra-stage.hmpps.dsd.io/health', method: 'http' },
+  { name: 'csra-app-prod', url: 'http://health-kick.hmpps.dsd.io/https/csra.service.hmpps.dsd.io', method: 'http' }
 ]
 
 def gather_health_data(server)
-    result = 0
-    puts "requesting #{server[:url]}..."
-    if server[:method] == 'http'
-        begin
-            uri = URI.parse(server[:url])
+  puts "requesting #{server[:url]}..."
 
-            http = Net::HTTP.new(uri.host, uri.port)
-            http.read_timeout = HTTP_TIMEOUT
-            if uri.scheme == "https"
-                http.use_ssl = true
-            end
+  server_response = HTTParty.get(server[:url], headers: { 'Accept' => 'application/json' })
 
-            request = Net::HTTP::Get.new(uri.request_uri)
-            if server[:auth]
-                basic_auth = ENV['BASIC_AUTH']
-                request.basic_auth basic_auth.split(':').first, basic_auth.split(':').last
-            end
+  puts server_response
+  puts "Result from #{server[:url]} is #{server_response}"
 
-            response = http.request(request)
-
-            if response.code == "200"
-                result = 1
-            else
-                result = 0
-            end
-        rescue Timeout::Error
-            result = 0
-        rescue Errno::ETIMEDOUT
-            result = 0
-        rescue Errno::EHOSTUNREACH
-            result = 0
-        rescue Errno::ECONNREFUSED
-            result = 0
-        rescue SocketError => e
-            result = 0
-        end
-    elsif server[:method] == 'ping'
-        result = `ping -q -c #{PING_COUNT} #{server[:url]}`
-        if $?.exitstatus == 0
-            result = 1
-        else
-            result = 0
-        end
-    end
-    puts "Result from #{server[:url]} is #{result}"
-    result
+  server_response
 end
 
-SCHEDULER.every '60s', :first_in => 0 do |job|
+SCHEDULER.every '60s', first_in: 0 do |_job|
   servers.each do |server|
     result = gather_health_data(server)
     send_event(server[:name], result: result)
