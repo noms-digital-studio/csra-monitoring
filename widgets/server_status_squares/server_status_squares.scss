@@ -19,14 +19,14 @@ $label-color:       rgba(255, 255, 255, 0.7);
   }
 
   .build-number {
-    font-size: 30px;
+    font-size: 25px;
     margin-bottom: 1em;
   }
 
   .services {
     display: block;
     padding: 0 1em;
-    // text-transform: uppercase;
+    text-transform: capitalize;
   }
 
   .services li {
