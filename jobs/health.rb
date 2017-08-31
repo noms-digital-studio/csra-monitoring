@@ -2,6 +2,7 @@
 require 'net/http'
 require 'uri'
 require 'httparty'
+require 'ap'
 
 #
 ### Global Config
@@ -31,20 +32,25 @@ PING_COUNT = 10
 #
 
 servers = [
-  { name: 'csra-app-mock', url: 'https://csra-mock.hmpps.dsd.io/health', method: 'http' },
-  { name: 'csra-app-stage', url: 'https://csra-stage.hmpps.dsd.io/health', method: 'http' },
-  { name: 'csra-app-prod', url: 'http://health-kick.hmpps.dsd.io/https/csra.service.hmpps.dsd.io', method: 'http' }
+  { name: 'csra-app-mock', url: 'https://csra-mock.hmpps.dsd.io/health' },
+  { name: 'csra-app-stage', url: 'https://csra-stage.hmpps.dsd.io/health'},
+  { name: 'csra-app-prod', url: 'http://health-kick.hmpps.dsd.io/https/csra.service.hmpps.dsd.io' }
 ]
 
 def gather_health_data(server)
   puts "requesting #{server[:url]}..."
 
-  server_response = HTTParty.get(server[:url], headers: { 'Accept' => 'application/json' })
-
-  puts server_response
-  puts "Result from #{server[:url]} is #{server_response}"
-
-  server_response
+  begin
+    server_response = HTTParty.get(server[:url], headers: { 'Accept' => 'application/json' }, timeout: 5)
+    ap server_response
+    return server_response
+  rescue HTTParty::Error => expection
+    ap expection.class
+    return { status: 'error', buildNumber: expection.class, checks: { db: "NA", viperRestService: "N/A" } }
+  rescue StandardError => expection
+    ap expection.class
+    return { status: 'error', buildNumber: expection.class, checks: { db: "NA", viperRestService: "N/A" } }
+  end
 end
 
 SCHEDULER.every '60s', first_in: 0 do |_job|
