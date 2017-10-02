@@ -1,5 +1,7 @@
 <h1 class="title" data-bind="title"></h1>
-<p class="build-number" data-bind="result.buildNumber"></p>
+<span class="build-number">Build #</span>
+<span class="build-number" data-bind="result.buildNumber"></span>
+
 <ul class="services">
     <li data-foreach-check="result.checks">
         <span class="label" data-bind="check"></span>
